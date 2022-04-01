@@ -4,14 +4,16 @@ const initialCellBlocks = [..."x".repeat(100).split("").keys()].map(
   (x) => x + 1
 );
 let excelLetters = [];
-
+let selectedBlock;
+let jsonObject = JSON.parse(localStorage.getItem("excel_data")) || {};
+console.log(jsonObject);
 function generate_table() {
   const body = document.getElementsByTagName("main")[0];
   const tbl = document.createElement("table");
   const thead = document.createElement("thead");
   const tbody = document.createElement("tbody");
   const row = document.createElement("tr");
-
+  const initialCell = document.createElement("th");
   alphabets.forEach((a) => {
     const cell = document.createElement("th");
     const cellText = document.createTextNode(a);
@@ -23,7 +25,16 @@ function generate_table() {
     const tr = document.createElement("tr");
     alphabets.forEach((al) => {
       const tableDocument = document.createElement("td");
+      const textNode = document.createTextNode(
+        jsonObject[al + i]?.cellValue || ""
+      );
       tr.appendChild(tableDocument);
+      tableDocument.appendChild(textNode);
+      tableDocument.setAttribute("data-cell_Id", al + i);
+      Object.assign(tableDocument, {
+        className: "table__document",
+        onclick: (event) => selectCell(event, { cellId: al + i, rowId: i }),
+      });
     });
 
     tbody.appendChild(tr);
@@ -46,6 +57,49 @@ function excelLogic() {
       excelLetters.push(character);
     });
   });
+}
+
+function selectCell(event, params) {
+  selectedBlock = event.target;
+  console.log(event.target.textContent);
+  const modalContainer = document.querySelector(".modal__input");
+  const modalTemplate = `<div class="modal__input-container">
+            <div>
+                <input type="text" onkeypress='watchKeyPress(event, ${JSON.stringify(
+                  params
+                )})' />
+                <div></div>
+                <button onclick="closeInputModal()">cancel</cancel>
+            </div>
+        </div>`;
+  modalContainer.innerHTML = modalTemplate;
+  const inputEl = document.querySelector("input");
+  inputEl.focus();
+  inputEl.defaultValue = event.target.textContent;
+}
+
+function watchKeyPress(event, { cellId, rowId }) {
+  if (event.key === "Enter") enterValueToBlock(cellId, rowId);
+}
+
+function enterValueToBlock(cellId, rowId) {
+  selectedBlock.textContent = "";
+  const textNode = document.createTextNode(
+    document.querySelector("input").value
+  );
+  selectedBlock.appendChild(textNode);
+  jsonObject = {
+    ...jsonObject,
+    [cellId]: { cellValue: textNode.textContent, rowId },
+  };
+  localStorage.setItem("excel_data", JSON.stringify(jsonObject));
+  console.log(jsonObject);
+  closeInputModal();
+}
+
+function closeInputModal() {
+  selectedBlock = null;
+  document.querySelector(".modal__input-container").remove();
 }
 
 generate_table();

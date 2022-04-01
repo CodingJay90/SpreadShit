@@ -2,15 +2,44 @@ table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
+
+  td,
+  th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+
+  td {
+    cursor: pointer;
+    &:active {
+      background-color: red;
+    }
+  }
+
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
 }
 
-td,
-th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
+.modal__input {
+  &-container {
+    position: fixed;
+    position: fixed;
+    top: 37%;
+    left: 33%;
+    bottom: 50%;
+    right: 50%;
 
-tr:nth-child(even) {
-  background-color: #dddddd;
+    div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      padding: 2rem;
+      width: 200px;
+      background-color: #531a7f;
+    }
+  }
 }
