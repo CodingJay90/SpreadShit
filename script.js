@@ -6,7 +6,7 @@ const initialCellBlocks = [..."x".repeat(100).split("").keys()].map(
 let excelLetters = [];
 let selectedBlock;
 let jsonObject = JSON.parse(localStorage.getItem("excel_data")) || {};
-console.log(jsonObject);
+
 function generate_table() {
   const body = document.getElementsByTagName("main")[0];
   const tbl = document.createElement("table");
@@ -14,6 +14,7 @@ function generate_table() {
   const tbody = document.createElement("tbody");
   const row = document.createElement("tr");
   const initialCell = document.createElement("th");
+  row.appendChild(initialCell);
   alphabets.forEach((a) => {
     const cell = document.createElement("th");
     const cellText = document.createTextNode(a);
@@ -23,6 +24,11 @@ function generate_table() {
   });
   initialCellBlocks.forEach((i) => {
     const tr = document.createElement("tr");
+    const initialTableDocument = document.createElement("td");
+    const text = document.createTextNode(i);
+    initialTableDocument.appendChild(text);
+    tr.appendChild(initialTableDocument);
+    tr.setAttribute("data-row_id", i);
     alphabets.forEach((al) => {
       const tableDocument = document.createElement("td");
       const textNode = document.createTextNode(
