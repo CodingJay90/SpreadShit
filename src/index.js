@@ -1,4 +1,5 @@
-const alpha = Array.from(Array(26)).map((e, i) => i + 65);
+import "./styles/styles.scss";
+const alpha = Array.from(Array(26)).map((_, i) => i + 65);
 const alphabets = alpha.map((x) => String.fromCharCode(x));
 const initialCellBlocks = [..."x".repeat(100).split("").keys()].map(
   (x) => x + 1
@@ -84,9 +85,9 @@ function selectCell(event, params) {
   inputEl.defaultValue = event.target.textContent;
 }
 
-function watchKeyPress(event, { cellId, rowId }) {
+window.watchKeyPress = function watchKeyPress(event, { cellId, rowId }) {
   if (event.key === "Enter") enterValueToBlock(cellId, rowId);
-}
+};
 
 function enterValueToBlock(cellId, rowId) {
   selectedBlock.textContent = "";
@@ -103,10 +104,10 @@ function enterValueToBlock(cellId, rowId) {
   closeInputModal();
 }
 
-function closeInputModal() {
+window.closeInputModal = function closeInputModal() {
   selectedBlock = null;
   document.querySelector(".modal__input-container").remove();
-}
+};
 
 generate_table();
 excelLogic();

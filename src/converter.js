@@ -1,11 +1,12 @@
+import { deleteDomElement, showLoadingSpinner } from "./utils";
+
 const downloadBtn = document.getElementById("download-csv");
-const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
-const cells = document.querySelectorAll("td");
 let headerColumns;
 let csvBody;
 let csv;
 
 function getFirstRow() {
+  const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
   let tempCsv = [];
   loopLevel1: for (row of tableRows) {
     loopLevel2: for (child of row.children) {
@@ -23,6 +24,7 @@ function getFirstRow() {
 }
 
 function getSubsequentColumns() {
+  const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
   const promise = new Promise((resolve, reject) => {
     try {
       let tempCsv = [];
@@ -36,8 +38,10 @@ function getSubsequentColumns() {
         });
         rowData.length && tempCsv.push(rowData);
       });
-      //   csvBody = tempCsv;
-      resolve(tempCsv);
+      csvBody = tempCsv;
+      setTimeout(() => {
+        resolve(tempCsv);
+      }, 1000);
       console.timeEnd("cells time");
     } catch (error) {
       reject(error);
@@ -60,10 +64,18 @@ function downloadCSV() {
   hiddenElement.target = "_blank";
 
   hiddenElement.download = "Unnamed.csv";
+  hiddenElement.click();
 }
 
-downloadBtn.addEventListener("click", () => {
-  console.log("downloadBtn clicked");
+downloadBtn.addEventListener("click", async () => {
+  try {
+    showLoadingSpinner();
+    await getSubsequentColumns();
+    downloadCSV();
+    deleteDomElement(".loading");
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // getFirstRow();

@@ -1,5 +1,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
+  // background-color: black;
+  // color: #00ff00;
 }
 
 table {
@@ -54,6 +56,11 @@ nav {
     justify-content: space-evenly;
     align-items: center;
     width: 20vw;
+
+    i {
+      cursor: pointer;
+      font-size: 2rem;
+    }
   }
 }
 
