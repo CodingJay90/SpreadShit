@@ -21,6 +21,7 @@ function getFirstRow() {
     row.textContent.length && tempCsv.push(row.textContent);
   }
   csv = tempCsv.join(",");
+  return csv;
 }
 
 function getSubsequentColumns() {
@@ -50,6 +51,14 @@ function getSubsequentColumns() {
   return promise;
 }
 
+function getSubsequentColumns2() {
+  const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
+  console.log(getFirstRow());
+  tableRows.forEach((row) => {
+    console.log(row);
+  });
+}
+
 function downloadCSV() {
   let tempCSV = "";
 
@@ -67,17 +76,18 @@ function downloadCSV() {
   hiddenElement.click();
 }
 
-downloadBtn.addEventListener("click", async () => {
-  try {
-    showLoadingSpinner();
-    await getSubsequentColumns();
-    downloadCSV();
-    deleteDomElement(".loading");
-  } catch (error) {
-    console.log(error);
-  }
-});
+// downloadBtn.addEventListener("click", async () => {
+//   try {
+//     showLoadingSpinner();
+//     await getSubsequentColumns();
+//     downloadCSV();
+//     deleteDomElement(".loading");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
-// getFirstRow();
+getFirstRow();
 // getSubsequentColumns();
+getSubsequentColumns2();
 // downloadCSV();
