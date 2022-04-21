@@ -5,11 +5,23 @@ let headerColumns;
 let csvBody;
 let csv;
 
+function convertJSONtoCSV(json) {
+  let tempCSV = "";
+
+  json.forEach((row) => {
+    tempCSV += row.join(",");
+    tempCSV += "\r\n";
+  });
+  return tempCSV;
+}
+
 function getFirstRow() {
   const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
   let tempCsv = [];
-  loopLevel1: for (row of tableRows) {
-    loopLevel2: for (child of row.children) {
+  let headerRows = [];
+  let lastHeaderId = "";
+  loopLevel1: for (let row of tableRows) {
+    loopLevel2: for (let child of row.children) {
       if (child.textContent.length && child.dataset.cell_id) {
         headerColumns = Array.from(child.parentElement.cells);
         break loopLevel1;
@@ -17,11 +29,15 @@ function getFirstRow() {
     }
   }
   headerColumns.shift();
-  for (row of headerColumns) {
-    row.textContent.length && tempCsv.push(row.textContent);
+  for (let row of headerColumns) {
+    if (row.textContent.length) {
+      tempCsv.push(row.textContent);
+      headerRows.push(row);
+    }
   }
+  lastHeaderId = headerRows[headerRows.length - 1].dataset.cell_id;
   csv = tempCsv.join(",");
-  return csv;
+  return { csv, json: tempCsv, lastCellId: lastHeaderId };
 }
 
 function getSubsequentColumns() {
@@ -52,17 +68,33 @@ function getSubsequentColumns() {
 }
 
 function getSubsequentColumns2() {
-  const tableRows = document.querySelectorAll("tbody tr[data-row_id]");
-  console.log(getFirstRow());
-  tableRows.forEach((row) => {
-    console.log(row);
-  });
+  const tableRows = Array.from(
+    document.querySelectorAll("tbody tr[data-row_id]")
+  );
+  let documentRows = [];
+  const { lastCellId } = getFirstRow();
+  for (let row of tableRows) {
+    const rowChildren = Array.from(row.children);
+    rowChildren.shift(); //remove the first td
+    let temp = [];
+    if (rowChildren.some((i) => i.textContent)) {
+      for (let child of row.children) {
+        if (child.dataset.cell_id) {
+          if (lastCellId[0] === child.dataset.cell_id[0]) break; //compare first character on the last cell and break if match
+          temp.push(child.textContent);
+        }
+      }
+    }
+    documentRows.push(temp);
+  }
+  // console.log(documentRows);
+  return documentRows.filter((i) => i.length);
 }
 
 function downloadCSV() {
   let tempCSV = "";
 
-  csvBody.forEach(function (row) {
+  csvBody.forEach((row) => {
     tempCSV += row.join(",");
     tempCSV += "\n";
   });
@@ -74,6 +106,19 @@ function downloadCSV() {
 
   hiddenElement.download = "Unnamed.csv";
   hiddenElement.click();
+}
+function convertCSVToJSON(csv) {
+  const csvRow = csv.split("\n"); //get headers
+  const keys = csvRow[0].split(","); //extract json keys from Array(csvRow)
+  let json = csvRow.splice(1);
+  json = json.map((i) => {
+    return i.split(",").reduce((acc, cur, i) => {
+      const tempObj = {};
+      tempObj[keys[i]] = cur;
+      return { ...acc, ...tempObj };
+    }, {});
+  });
+  return json;
 }
 
 // downloadBtn.addEventListener("click", async () => {
@@ -87,7 +132,16 @@ function downloadCSV() {
 //   }
 // });
 
-getFirstRow();
-// getSubsequentColumns();
-getSubsequentColumns2();
+// getFirstRow();
+// // getSubsequentColumns();
+// getSubsequentColumns().then((data) => console.log(data));
+// console.log(getSubsequentColumns2());
+// console.log(convertJSONtoCSV(getSubsequentColumns2()));
+console.log(
+  convertCSVToJSON(`Name,Proffession,Hobbies,Age,Marital status,Finacial status
+Bobby Brown,Athlete,Swimming,24,Single,Rich
+anotonio Roberto,farmer,,45,married,Average
+jay,,,,,
+,,,,,ghfgg`)
+);
 // downloadCSV();
